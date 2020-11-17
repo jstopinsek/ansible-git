@@ -1,0 +1,5 @@
+- hosts: dockerhosts
+  user: ansible
+  roles:
+    - common
+    - docker
