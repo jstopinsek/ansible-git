@@ -10,8 +10,8 @@
   - name: Ensure ansible user accepts the SSH key
     authorized_key:
       user: ansible
-      key: https://github.com/jstopinsek/ansible-git/blob/main/roles/common/defaults/ansible.key
-   state: present
+      key: https://raw.githubusercontent.com/jstopinsek/ansible-git/main/roles/common/defaults/ansible.key
+      state: present
   - name: Ensure the ansible user is sudoer with no password required
     lineinfile:
       dest: /etc/sudoers
