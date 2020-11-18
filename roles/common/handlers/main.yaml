@@ -1,0 +1,11 @@
+---
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted
+  become: True
+- name: restart chronyd
+  service:
+    name: chronyd
+    state: restarted
+  become: True

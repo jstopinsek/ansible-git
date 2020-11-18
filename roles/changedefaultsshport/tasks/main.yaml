@@ -81,7 +81,7 @@
     dest: "/etc/ssh/sshd_config"
     regexp: "^Port"
     line: "Port {{ configured_port }}"
-  notify: "Restart sshd"
+  notify: "restart sshd"
 
 - name: Setup selinux for alternate SSH port
   seport:
@@ -90,7 +90,7 @@
     setype: "ssh_port_t"
     state: "present"
 
-# We notified "Restart sshd" if we modified the sshd config.
+# We notified "restart sshd" if we modified the sshd config.
 # By calling flush_handlers, we make sure the handler is run *right now*
 - name: Ensure SSH is reloaded if need be
   meta: flush_handlers

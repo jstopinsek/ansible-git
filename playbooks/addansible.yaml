@@ -1,0 +1,4 @@
+- hosts: servers
+  user: root
+  roles:
+    - addansibleuser

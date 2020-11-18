@@ -1,0 +1,6 @@
+- hosts: servers
+  user: ansible
+  gather_facts: no
+  become: yes
+  roles:
+    - changedefaultsshport2
