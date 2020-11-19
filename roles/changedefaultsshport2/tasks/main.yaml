@@ -6,9 +6,9 @@
     immediate: yes
     state: disabled
 
-- name: Setup selinux remove SSH port 22
-  seport:
-    ports: 22
-    proto: tcp
-    setype: ssh_port_t
-    state: absent
+#- name: Setup selinux remove SSH port 22
+#  seport:
+#    ports: 22
+#    proto: tcp
+#    setype: ssh_port_t
+#    state: absent

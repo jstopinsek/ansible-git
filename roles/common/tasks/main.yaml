@@ -1,34 +1,53 @@
 ---
+- name: Include vars
+  include_vars: ../vars/main.yml
+
 - name: Ensure EPEL is enabled
   yum:
     name: epel-release
     state: present
   become: True
+
 - name: Ensure python3-libselinux is present
   yum:
     name: python3-libselinux
     state: present
   become: True
+
 - name: Ensure python3-libsemanage is present
   yum:
     name: python3-libsemanage
     state: present
   become: True
+
 - name: Ensure python3-policycoreutils is present
   yum:
     name: python3-policycoreutils
     state: present
   become: True
+
 - name: Ensure we have last version of every package
   yum:
     name: "*"
     state: latest
   become: True
+
 - name: Ensure NTP chrony is installed
   yum:
     name: chrony
     state: present
   become: True
+
+- name: install chrony.conf
+  template:
+    src: ../templates/chrony.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: True
+  notify: restart chronyd
+
 #- name: Ensure the timezone is set to UTC
 - name: Ensure the timezone is set to Europe/Ljubljana
   file:
@@ -37,23 +56,27 @@
     dest: /etc/localtime
     state: link
   become: True
+
 #- name: Ensure the NTP service is running and enabled
 #  service:
 #    name: ntpd
 #    state: started
 #    enabled: True
 #  become: True
+
 - name: Ensure FirewallD is installed
   yum:
     name: firewalld
     state: present
   become: True
+
 - name: Ensure FirewallD is running
   service:
     name: firewalld
     state: started
     enabled: True
   become: True
+
 - name: Ensure SSH can pass the firewall
   firewalld:
     service: ssh
@@ -61,6 +84,7 @@
     permanent: True
     immediate: True
   become: True
+
 - name: Ensure the MOTD file is present and updated
   template:
     src: motd
@@ -69,61 +93,73 @@
     group: root
     mode: 0644
   become: True
+
 - name: Ensure the hostname is the same of the inventory
   hostname:
     name: "{{ inventory_hostname }}"
   become: True
+
 - name: Ensure bash-completion is installed
   yum:
     name: bash-completion
     state: present
   become: True
+
 - name: Ensure google-authenticator is installed
   yum:
     name: google-authenticator,qrencode
     state: present
   become: True
+
 #- name: Ensure qrencode is installed
 #  yum:
 #    name: qrencode
 #    state: present
 #  become: True
+
 - name: Ensure fail2ban is installed
   yum:
     name: fail2ban
     state: present
   become: True
+
 - name: Setup SSH for Google authenticator
   lineinfile:
     dest: "/etc/ssh/sshd_config"
     regexp: "^#ChallengeResponseAuthentication yes"
     line: "ChallengeResponseAuthentication yes"
+
 - name: Setup SSH for Google authenticator
   lineinfile:
     dest: "/etc/ssh/sshd_config"
     regexp: "^ChallengeResponseAuthentication no"
     line: "#ChallengeResponseAuthentication no"
   notify: "restart sshd"
+
 - name: Setup pam for sshd
   lineinfile:
     dest: "/etc/pam.d/sshd"
     insertafter: "^#%PAM-1.0"
     line: "auth       required     pam_google_authenticator.so secret=${HOME}/.ssh/.google_authenticator"
+
 - name: bash variable HISTTIMEFORMAT
   lineinfile:
     dest: "/etc/profile"
     insertafter: EOL
     line: 'HISTTIMEFORMAT="%d/%m/%y  %T  "'
+
 - name: bash variable PROMPT_COMMAND
   lineinfile:
     dest: "/etc/profile"
     insertafter: EOL
     line: 'PROMPT_COMMAND="history -a"'
+
 - name: alias for google authenticator
   lineinfile:
     dest: "/etc/profile"
     insertafter: EOL
     line: "alias google-authenticator='[[ ! -e ${HOME}/.ssh ]] && mkdir -m 0700 ${HOME}/.ssh;google-authenticator -s ~/.ssh/.google_authenticator -t -C -f -w 3 -r 3 -R 30 -d'"
+
 # We notified "restart sshd" if we modified the sshd config.
 # By calling flush_handlers, we make sure the handler is run *right now*
 - name: Ensure SSH is reloaded if need be

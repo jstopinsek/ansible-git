@@ -1,2 +1,5 @@
 [servers]
-192.168.65.69
+edusrv56 ansible_port=22 ansible_host=192.168.65.69
+
+[edusrv]
+edusrv56 ansible_port=22 ansible_host=84.255.209.56
