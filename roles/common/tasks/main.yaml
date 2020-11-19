@@ -123,6 +123,12 @@
     state: present
   become: True
 
+- name: Disable root login
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#PermitRootLogin yes"
+    line: "PermitRootLogin no"
+
 - name: Setup SSH for Google authenticator
   lineinfile:
     dest: "/etc/ssh/sshd_config"
@@ -159,6 +165,18 @@
     dest: "/etc/profile"
     insertafter: EOL
     line: "alias google-authenticator='[[ ! -e ${HOME}/.ssh ]] && mkdir -m 0700 ${HOME}/.ssh;google-authenticator -s ~/.ssh/.google_authenticator -t -C -f -w 3 -r 3 -R 30 -d'"
+
+- name: Ensure certbot is present
+  yum:
+    name: certbot
+    state: present
+  become: True
+
+- name: Ensure python3-certbot-nginx is present
+  yum:
+    name: python3-certbot-nginx
+    state: present
+  become: True
 
 # We notified "restart sshd" if we modified the sshd config.
 # By calling flush_handlers, we make sure the handler is run *right now*

@@ -1,5 +1,5 @@
-[servers]
-myserver ansible_port=4738 ansible_host=192.168.65.69
+#[servers]
+#edusrv56 ansible_port=4738 ansible_host=192.168.65.69
 
-[edusrv]
+[servers]
 edusrv56 ansible_port=4738 ansible_host=84.255.209.56
