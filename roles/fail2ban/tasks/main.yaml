@@ -1,0 +1,35 @@
+---
+- name: Include vars
+  include_vars: ../vars/main.yml
+
+- name: Ensure EPEL is enabled
+  yum:
+    name: epel-release
+    state: present
+  become: True
+
+- name: Ensure fail2ban is present
+  yum:
+    name: fail2ban
+    state: present
+  become: True
+
+- name: install chrony.conf
+  template:
+    src: ../templates/jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: 0644
+  become: True
+  notify: restart fail2ban
+
+- name: Ensure fail2ban is running
+  service:
+    name: fail2ban
+    state: started
+    enabled: True
+  become: True
+
+- name: Ensure services are restarted
+  meta: flush_handlers

@@ -1,0 +1,58 @@
+---
+- name: Disable root password
+  user:
+    name: root
+    password: "!!"
+- name: Remove root keys
+  file:
+    path: /root/.ssh/authorized_keys
+    state: absent
+- name: Ensure jstopinsek user exists
+  user:
+    name: jstopinsek
+    groups: wheel
+    password: $6$nRfqxJMO0oE0T9gw$pfgCfT6yBWlIc6oPn.P.jvqFHoBixReyikOxwe4K/q2zqhBLQNawSKViTu8khWlUkdZH1Mq/0BGV18IiKOVOX.
+    state: present
+    comment: Jernej Stopinšek
+- name: Set authorized key for jstopinsek
+  authorized_key:
+    user: jstopinsek
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDYfc8thdtNt2LJt283VBiFxbnSyAcJc89btxlb6ziTiE3EDeyeLhv7kn6CTvXY6t5D7L/mZBB7lxjlw8wPM3ziY3EF0vyuJauSjIA4QW5zJfAaGFJxEeCdUQVA6KxZAgVBvicGhU+GJXxTvvTpNVIDDiO6D3V2J5jHGWC9F0OA2tDJaNd7uLeDDkVsbGS+Z3q/WwhsWvhb+kTU0POx1GUAK3Aqosg8BNCvPPGCIWNbtMdmDwYOY4TfT7vlFuD97lIkqiQDkrsgexPqoC1ce7VprG9d8jWLqjtPQKwHf+M9/JS3seOt2ab7yrJcB21mhKH6m4vskyuWzWOSg4E0/4Ac6fFaBtTyA5Xlvjq1wBAS9ulhI3pEcvYdRDnUDLFtm2pAQ9xl9sBRviqFR8c1GWtpUPX+sfrj3U+B3c81IQTVnYACo/2+K3qN+hmMb42+jYtB43pJfW8jpKPhhbMlJjvR2gj48A7eElsUV88EpfbEUJeF4MuBMUPfGU++gUf0FTommGlfQwlLVCV4m7beVQU0LX0Y57a0Y0xwMCO2wIYr5YDWNlt/N/awkIkGM+21eE1XNZeqPr02wPrmZUMc6+KeVVEARQ4iHj1fyw++4K1swGw0fXfXHSMcOYigwzD4/qEpLqZQFoFo1qInV8R3pLh2yHKHeWQryQpRmb+EucbLfw== jernej.stopinsek@gmail.com"
+    state: present
+- name: Ensure vladimirs user exists
+  user:
+    name: vladimirs
+    groups: wheel
+    password: $6$Z6YczuDriEOIW1q.$c5vTku0iRU9X4MVhWC63EJhPNQ.BSUzGPRBrcP0MGFrTbrd4to35LI2YGiBVVOUpUBtc2CAFGYVFZMkCCzOER.
+    state: present
+    comment: Vladimir Smrekar
+- name: Create a directory if it does not exist jstopinsek .ssh
+  file:
+    path: /home/jstopinsek/.ssh
+    state: directory
+    owner: jstopinsek
+    group: jstopinsek
+    mode: '0700'
+- name: set 2fa for jstopinsek
+  template:
+    src: google_authenticator_jstopinsek
+    dest: /home/jstopinsek/.ssh/.google_authenticator
+    owner: jstopinsek
+    group: jstopinsek
+    mode: 0400
+  become: True
+- name: Create a directory if it does not exist vladimirs .ssh
+  file:
+    path: /home/vladimirs/.ssh
+    state: directory
+    owner: vladimirs
+    group: vladimirs
+    mode: '0700'
+- name: set 2fa for vladimirs
+  template:
+    src: google_authenticator_vladimirs
+    dest: /home/vladimirs/.ssh/.google_authenticator
+    owner: vladimirs
+    group: vladimirs
+    mode: 0400
+  become: True

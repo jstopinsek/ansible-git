@@ -1,0 +1,16 @@
+---
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+  become: True
+- name: restart mariadb
+  service:
+    name: mariadb
+    state: restarted
+  become: True
+- name: restart php-fpm
+  service:
+    name: php-fpm
+    state: restarted
+  become: True

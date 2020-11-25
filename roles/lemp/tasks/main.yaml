@@ -1,0 +1,118 @@
+---
+- name: Include vars
+  include_vars: ../vars/main.yml
+
+- name: Ensure EPEL is enabled
+  yum:
+    name: epel-release
+    state: present
+  become: True
+
+- name: Ensure nginx is present
+  yum:
+    name: nginx
+    state: present
+  become: True
+
+- name: Ensure nginx is running
+  service:
+    name: nginx
+    state: started
+    enabled: True
+  become: True
+
+- name: Ensure HTTP can pass the firewall
+  firewalld:
+    service: http
+    state: enabled
+    permanent: True
+    immediate: True
+  become: True
+
+- name: Ensure HTTPS can pass the firewall
+  firewalld:
+    service: https
+    state: enabled
+    permanent: True
+    immediate: True
+  become: True
+
+- name: Setup selinux for alternate SSH port
+  seport:
+    ports: 80
+    proto: tcp
+    setype: http_port_t
+    state: present
+
+- name: Setup selinux for alternate SSH port
+  seport:
+    ports: 443
+    proto: tcp
+    setype: http_port_t
+    state: present
+
+- name: Ensure mariadb is present
+  yum:
+    name: mariadb-server
+    state: present
+  become: True
+
+- name: Ensure mariadb is running
+  service:
+    name: mariadb
+    state: started
+    enabled: True
+  become: True
+
+- name: Ensure php-fpm is present
+  yum:
+    name:
+      - php-fpm
+      - php-common
+      - php-cli
+      - php-mysqlnd
+    state: present
+  become: True
+
+- name: Ensure php-fpm is running
+  service:
+    name: php-fpm
+    state: started
+    enabled: True
+  become: True
+
+- name: Ensure certbot is present
+  yum:
+    name: certbot
+    state: present
+  become: True
+
+- name: Ensure redis is present
+  yum:
+    name:
+      - redis
+#      - php-redis
+#      - php-imagick
+      - php-intl
+      - php-pecl-apcu
+      - php-opcache
+      - php-json
+      - php-zip
+    state: present
+  become: True
+
+- name: Ensure redis is running
+  service:
+    name: redis
+    state: started
+    enabled: True
+  become: True
+
+- name: Install yum utils
+  yum:
+    name: yum-utils
+    state: latest
+  become: True
+
+- name: Ensure services are restarted
+  meta: flush_handlers

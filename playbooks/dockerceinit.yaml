@@ -1,0 +1,5 @@
+- hosts: servers
+  user: ansible
+  become: yes
+  roles:
+    - dockerceinit

@@ -1,0 +1,51 @@
+---
+- name: Include vars
+  include_vars: ../vars/main.yml
+
+- name: install mariadb
+  yum:
+    name:
+      - mariadb-server
+      - python3-PyMySQL
+    state: latest
+
+- name: start mariadb
+  service:
+    name: mariadb
+    enabled: true
+    state: started
+
+- name: mysql_root_password
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    user: root
+    check_implicit_admin: true
+    password: "{{ mysql_root_password }}"
+    host: localhost
+
+#- name: remove remote root
+#  mysql_user:
+#    check_implicit_admin: true
+#    login_user: root
+#    login_password: "{{ mysql_root_password }}"
+#    user: root
+#    host: "{{ ansible_fqdn }}"
+#    state: absent
+#  notify: restart mariadb
+
+- name: Create a new database with name 'wp'
+  mysql_db:
+    name: wp
+    state: present
+
+- name: Create user with password, all database privileges and 'WITH GRANT OPTION' wp
+  mysql_user:
+    state: present
+    name: wp
+    password: "{{ mysql_wp_password }}"
+    priv: "wp.*:ALL,GRANT"
+    host: "%"
+
+- name: Ensure services are restarted
+  meta: flush_handlers
